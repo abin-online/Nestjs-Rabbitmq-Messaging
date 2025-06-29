@@ -1,18 +1,25 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import 'dotenv/config'; 
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   await app.listen(3000);
-  console.log('server is running on http://localhost:3000');
+  console.log('✅ Server started');
+
+  const rabbitUrl = process.env.RABBITMQ_URL;
+
+  if (!rabbitUrl) {
+    throw new Error('Missing RABBITMQ_URL in env ');
+  }
 
   // client A's receiver
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://localhost:5672'],
+      urls: [rabbitUrl],
       queue: 'to-clientA',
       queueOptions: { durable: true },
       noAck: false,
@@ -23,7 +30,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://localhost:5672'],
+      urls: [rabbitUrl], 
       queue: 'to-clientB',
       queueOptions: { durable: true },
       noAck: false,
@@ -31,6 +38,6 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-  console.log('✅ Both microservices are listening...');
+  console.log('Microservices are listening...');
 }
 bootstrap();

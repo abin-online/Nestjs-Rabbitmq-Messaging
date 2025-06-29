@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ClientAService } from './client-a/client-a.service';
 import { ClientAController } from './client-a/client-a.controller';
@@ -7,28 +8,39 @@ import { ClientBService } from './client-b/client-b.service';
 
 @Module({
   imports: [
-    ClientsModule.register([
+    ConfigModule.forRoot({ isGlobal: true }),
+    ClientsModule.registerAsync([
       {
         name: 'RABBITMQ_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'to-clientB',
-          queueOptions: { durable: true },
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.getOrThrow<string>('RABBITMQ_URL')],
+            queue: 'to-clientB',
+            queueOptions: { durable: true },
+          },
+        }),
+
       },
       {
         name: 'RABBITMQ_CLIENT_B',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://localhost:5672'],
-          queue: 'to-clientA',
-          queueOptions: { durable: true },
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.getOrThrow<string>('RABBITMQ_URL')],
+            queue: 'to-clientB',
+            queueOptions: { durable: true },
+          },
+        }),
+
       },
     ]),
   ],
   controllers: [ClientAController, ClientBController],
   providers: [ClientAService, ClientBService],
 })
-export class AppModule {}
+export class AppModule { }
