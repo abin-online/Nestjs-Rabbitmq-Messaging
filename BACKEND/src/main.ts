@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   await app.listen(3000);
-  console.log('✅ Server started');
+  console.log('Server started');
 
   const rabbitUrl = process.env.RABBITMQ_URL;
 
@@ -15,7 +15,7 @@ async function bootstrap() {
     throw new Error('Missing RABBITMQ_URL in env ');
   }
 
-  // client A's receiver
+  // client A receiver
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
@@ -26,7 +26,7 @@ async function bootstrap() {
     },
   });
 
-  // client B's receiver
+  // client B receiver
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
@@ -38,6 +38,6 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-  console.log('Microservices are listening...');
+  console.log('Microservices are listening');
 }
 bootstrap();

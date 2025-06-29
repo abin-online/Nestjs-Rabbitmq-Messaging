@@ -24,7 +24,7 @@ export class ClientBController {
         throw new Error(' Simulated processing error!');
       }
 
-      // ACK only on success
+      // ACK when it is a success
       channel.ack(originalMessage);
     } catch (err: any) {
       console.error('Error:', err.message);
@@ -32,11 +32,11 @@ export class ClientBController {
       // NACK with requeue once
       const retries = originalMessage.properties.headers['x-retries'] || 0;
       if (retries < 2) {
-        // Set a retry header and requeue
+        //retry header and requeue
         channel.nack(originalMessage, false, true);
       } else {
-        console.log('💀 Max retries hit — rejecting without requeue');
-        channel.nack(originalMessage, false, false); // Push to DLQ if configured
+        console.log('maximum retries exceeded');
+        channel.nack(originalMessage, false, false); // DLQ.push if it is  configured
       }
     }
   }
