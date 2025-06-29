@@ -136,15 +136,7 @@ Includes:
 
 **Abin Babu**
 💼 Full-stack Developer | MERN & Microservices
-🌐 [GitHub](https://github.com/abin-online)
+🌐 [PORTFOLIO](https://abinbabu.vercel.app/)
 
----
 
-> Built with ❤️ for real-time systems and message-driven architecture.
-
-```
-
----
-
-Let me know if you want to include badges, flow diagrams, or Docker tips too. This doc is ready for upload as your `README.md`. 💪📘
 ```
